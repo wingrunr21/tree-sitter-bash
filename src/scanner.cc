@@ -1,6 +1,7 @@
 #include <tree_sitter/parser.h>
 #include <string>
 #include <cwctype>
+#include <cstring>
 
 namespace {
 
