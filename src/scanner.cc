@@ -4,7 +4,7 @@
 
 namespace {
 
-using std::wstring;
+using std::string;
 
 enum TokenType {
   SIMPLE_HEREDOC,
@@ -29,13 +29,23 @@ struct Scanner {
 
   void reset() {}
 
-  bool serialize(TSExternalTokenState state) { return true; }
+  unsigned serialize(char *buffer) {
+    unsigned length = heredoc_delimiter.size();
+    if (length < TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
+      memcpy(buffer, heredoc_delimiter.data(), length);
+      return length;
+    } else {
+      return 0;
+    }
+  }
 
-  void deserialize(TSExternalTokenState state) {}
+  void deserialize(const char *buffer, unsigned length) {
+    heredoc_delimiter.assign(buffer, buffer + length);
+  }
 
   bool scan_heredoc_end_identifier(TSLexer *lexer) {
     current_leading_word.clear();
-    while (iswalpha(lexer->lookahead)) {
+    while (iswalpha(lexer->lookahead) || lexer->lookahead == '_') {
       current_leading_word += lexer->lookahead;
       advance(lexer);
     }
@@ -49,6 +59,7 @@ struct Scanner {
       switch (lexer->lookahead) {
         case '\0': {
           lexer->result_symbol = end_type;
+          heredoc_delimiter.clear();
           return true;
         }
 
@@ -62,6 +73,7 @@ struct Scanner {
           advance(lexer);
           if (scan_heredoc_end_identifier(lexer)) {
             lexer->result_symbol = end_type;
+            heredoc_delimiter.clear();
             return true;
           }
           break;
@@ -109,7 +121,7 @@ struct Scanner {
 
     if (valid_symbols[HEREDOC_BEGINNING]) {
       heredoc_delimiter.clear();
-      while (iswalpha(lexer->lookahead)) {
+      while (iswalpha(lexer->lookahead) || lexer->lookahead == '_') {
         heredoc_delimiter += lexer->lookahead;
         advance(lexer);
       }
@@ -182,8 +194,8 @@ struct Scanner {
     return false;
   }
 
-  wstring heredoc_delimiter;
-  wstring current_leading_word;
+  string heredoc_delimiter;
+  string current_leading_word;
 };
 
 }
@@ -205,14 +217,14 @@ void tree_sitter_bash_external_scanner_reset(void *payload) {
   scanner->reset();
 }
 
-bool tree_sitter_bash_external_scanner_serialize(void *payload, TSExternalTokenState state) {
+unsigned tree_sitter_bash_external_scanner_serialize(void *payload, char *buffer) {
   Scanner *scanner = static_cast<Scanner *>(payload);
-  return scanner->serialize(state);
+  return scanner->serialize(buffer);
 }
 
-void tree_sitter_bash_external_scanner_deserialize(void *payload, TSExternalTokenState state) {
+void tree_sitter_bash_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
   Scanner *scanner = static_cast<Scanner *>(payload);
-  scanner->deserialize(state);
+  scanner->deserialize(buffer, length);
 }
 
 void tree_sitter_bash_external_scanner_destroy(void *payload) {

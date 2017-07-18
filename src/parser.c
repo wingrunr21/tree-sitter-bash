@@ -37705,10 +37705,9 @@ static TSParseActionEntry ts_parse_actions[] = {
 
 void *tree_sitter_bash_external_scanner_create();
 void tree_sitter_bash_external_scanner_destroy();
-void tree_sitter_bash_external_scanner_reset(void *);
 bool tree_sitter_bash_external_scanner_scan(void *, TSLexer *, const bool *);
-bool tree_sitter_bash_external_scanner_serialize(void *, TSExternalTokenState);
-void tree_sitter_bash_external_scanner_deserialize(void *, const TSExternalTokenState);
+unsigned tree_sitter_bash_external_scanner_serialize(void *, char *);
+void tree_sitter_bash_external_scanner_deserialize(void *, const char *, unsigned);
 
 const TSLanguage *tree_sitter_bash() {
   GET_LANGUAGE(
@@ -37716,7 +37715,6 @@ const TSLanguage *tree_sitter_bash() {
     ts_external_scanner_symbol_map,
     tree_sitter_bash_external_scanner_create,
     tree_sitter_bash_external_scanner_destroy,
-    tree_sitter_bash_external_scanner_reset,
     tree_sitter_bash_external_scanner_scan,
     tree_sitter_bash_external_scanner_serialize,
     tree_sitter_bash_external_scanner_deserialize,

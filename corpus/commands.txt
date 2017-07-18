@@ -158,13 +158,13 @@ cat a b > /dev/null
 Heredoc redirects
 ===============================
 
-node <<JS
+node <<I_AM_A_VERY_VERY_LONG_HEREDOC_IDENTIFIER_SO_I_NEED_MY_OWN_HEAP_ALLOCATION
 console.log("hi")
-JS
+I_AM_A_VERY_VERY_LONG_HEREDOC_IDENTIFIER_SO_I_NEED_MY_OWN_HEAP_ALLOCATION
 
-bash -c <<JS
+bash -c <<IM_SHORT
 echo hi
-JS
+IM_SHORT
 
 ---
 
@@ -181,9 +181,9 @@ JS
 Heredocs with variables
 ===============================
 
-node <<JS
+node <<YES_MORE_BASH
 a $B ${C}
-JS
+YES_MORE_BASH
 
 exit
 
