@@ -28,7 +28,7 @@ addons:
 
 branches:
   only:
-    - master
+    - prebuild_support_test
     - /^v.*$/
 
 deploy:
